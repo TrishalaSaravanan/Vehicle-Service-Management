@@ -1,0 +1,276 @@
+<div class="p-8">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h2 class="text-3xl font-bold text-gray-800">Mechanic Work Assignment</h2>
+      <p class="text-gray-600">Assign service requests to mechanics and track progress</p>
+    </div>
+    <div class="flex space-x-3">
+      <button (click)="toggleMechanicForm()" 
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center">
+        <i class="fas fa-user-plus mr-2"></i> Add Mechanic
+      </button>
+      <button (click)="toggleRequestForm()" 
+              class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+        <i class="fas fa-plus-circle mr-2"></i> New Request
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white p-4 rounded-lg shadow">
+      <div class="text-gray-500 text-sm">Total Mechanics</div>
+      <div class="text-2xl font-bold">{{ getStatsCards().totalMechanics }}</div>
+      <div class="text-xs text-gray-500 mt-1">{{ getStatsCards().availableMechanics }} available</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg shadow">
+      <div class="text-gray-500 text-sm">Service Requests</div>
+      <div class="text-2xl font-bold">{{ getStatsCards().totalRequests }}</div>
+      <div class="text-xs text-gray-500 mt-1">{{ getStatsCards().pendingRequests }} pending</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg shadow">
+      <div class="text-gray-500 text-sm">In Progress</div>
+      <div class="text-2xl font-bold">{{ getStatsCards().inProgressRequests }}</div>
+      <div class="text-xs text-gray-500 mt-1">{{ getStatsCards().activeJobs }} active jobs</div>
+    </div>
+    <div class="bg-white p-4 rounded-lg shadow">
+      <div class="text-gray-500 text-sm">Completed Today</div>
+      <div class="text-2xl font-bold">{{ getStatsCards().completedToday }}</div>
+      <div class="text-xs text-gray-500 mt-1">{{ getStatsCards().totalCompleted }} total</div>
+    </div>
+  </div>
+
+  <!-- Add Mechanic Form -->
+  <div *ngIf="showMechanicForm" class="bg-white p-6 rounded-xl shadow-md mb-6">
+    <h3 class="text-xl font-semibold mb-4">Add New Mechanic</h3>
+    <form (ngSubmit)="addNewMechanic()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input type="text" [(ngModel)]="newMechanic.name" name="name" class="w-full border rounded p-2" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
+        <input type="text" [(ngModel)]="newMechanic.specialization" name="specialization" class="w-full border rounded p-2" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Experience</label>
+        <input type="text" [(ngModel)]="newMechanic.experience" name="experience" class="w-full border rounded p-2" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Max Workload</label>
+        <input type="number" [(ngModel)]="newMechanic.maxWorkload" name="maxWorkload" min="1" max="10" class="w-full border rounded p-2" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label>
+        <input type="number" [(ngModel)]="newMechanic.rating" name="rating" min="1" max="5" step="0.1" class="w-full border rounded p-2" required>
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+          Add Mechanic
+        </button>
+        <button type="button" (click)="toggleMechanicForm()" class="ml-2 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Add Request Form -->
+  <div *ngIf="showRequestForm" class="bg-white p-6 rounded-xl shadow-md mb-6">
+    <h3 class="text-xl font-semibold mb-4">Create New Service Request</h3>
+    <form (ngSubmit)="addNewServiceRequest()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+        <input type="text" [(ngModel)]="newRequest.customer" name="customer" class="w-full border rounded p-2" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle Details</label>
+        <input type="text" [(ngModel)]="newRequest.vehicle" name="vehicle" class="w-full border rounded p-2" required>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Issue Description</label>
+        <textarea [(ngModel)]="newRequest.issue" name="issue" class="w-full border rounded p-2" rows="3" required></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+        <select [(ngModel)]="newRequest.priority" name="priority" class="w-full border rounded p-2" required>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          Create Request
+        </button>
+        <button type="button" (click)="toggleRequestForm()" class="ml-2 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Mechanics Status -->
+  <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold">Mechanic Team</h3>
+      <div class="text-sm text-gray-500">
+        Showing {{ mechanics.length }} mechanics
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mechanic</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialization</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Workload</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let mechanic of mechanics" class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center">
+                  <i class="fas fa-user text-gray-500"></i>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">{{ mechanic.name }}</div>
+                  <div class="text-sm text-gray-500">{{ mechanic.id }}</div>
+                  <div class="text-xs text-yellow-500">
+                    {{ getStarRating(mechanic.rating) }} {{ mechanic.rating }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ mechanic.specialization }}</div>
+              <div class="text-xs text-gray-500">{{ mechanic.experience }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 mb-1">{{ mechanic.currentWorkload }}/{{ mechanic.maxWorkload }} jobs</div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="h-2 rounded-full {{ getWorkloadColor(getWorkloadPercentage(mechanic)) }}" 
+                     [style.width.%]="getWorkloadPercentage(mechanic)"></div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full {{ getStatusColor(mechanic.status) }}">
+                {{ mechanic.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Service Requests -->
+  <div class="bg-white p-6 rounded-xl shadow-md">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold">Service Requests</h3>
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-500">
+          Showing {{ serviceRequests.length }} requests
+        </span>
+        <select class="border rounded p-1 text-sm">
+          <option>All Status</option>
+          <option>Pending</option>
+          <option>In Progress</option>
+          <option>Completed</option>
+        </select>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let request of getSortedRequests()" class="hover:bg-gray-50 transition">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ request.id }}</div>
+              <div class="text-xs text-gray-500">{{ request.date }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ request.customer }}</div>
+              <div class="text-xs text-gray-500">{{ request.vehicle }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900">{{ request.issue }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full {{ getPriorityColor(request.priority) }}">
+                {{ request.priority }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div *ngIf="request.status === 'Pending'">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Pending</span>
+              </div>
+              <div *ngIf="request.status === 'Assigned'" class="flex flex-col">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 mb-1">
+                  Assigned to {{ request.assignedMechanic }}
+                </span>
+                <span class="text-xs text-gray-500">Since {{ request.assignedDate }}</span>
+              </div>
+              <div *ngIf="request.status === 'Completed'" class="flex flex-col">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 mb-1">
+                  Completed
+                </span>
+                <span class="text-xs text-gray-500">{{ request.completedDate }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <!-- Pending Status Actions -->
+              <div *ngIf="request.status === 'Pending'" class="flex space-x-2">
+                <select [(ngModel)]="selectedMechanicId[request.id]" 
+                        name="assignSelect-{{ request.id }}" 
+                        class="border rounded p-1 text-sm w-64">
+                  <option value="">Select Mechanic</option>
+                  <option *ngFor="let mechanic of getAvailableMechanics()" 
+                          [value]="mechanic.id"
+                          [class]="'bg-green-50'">
+                    {{ mechanic.name }} ({{ mechanic.specialization }}) - {{ mechanic.currentWorkload }}/{{ mechanic.maxWorkload }} jobs
+                  </option>
+                </select>
+                <button (click)="assignWork(request.id, selectedMechanicId[request.id])" 
+                        class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                        [disabled]="!selectedMechanicId[request.id]">
+                  Assign
+                </button>
+              </div>
+              
+              <!-- Assigned Status Actions -->
+              <div *ngIf="request.status === 'Assigned'">
+                <button (click)="completeWork(request.id)" 
+                        class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
+                  <i class="fas fa-check-circle mr-1"></i>Complete
+                </button>
+              </div>
+              
+              <!-- Completed Status Actions -->
+              <div *ngIf="request.status === 'Completed'" class="flex space-x-2">
+                <span class="text-gray-500 text-sm flex items-center">
+                  <i class="fas fa-check text-green-500 mr-1"></i> Done
+                </span>
+                <button class="text-blue-500 hover:text-blue-700">
+                  <i class="fas fa-file-invoice"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

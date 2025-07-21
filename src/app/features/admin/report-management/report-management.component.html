@@ -1,0 +1,219 @@
+<div class="report-management-container">
+  <!-- Header -->
+  <div class="report-header">
+    <h1>Report Management</h1>
+    <p>Generate and manage customer and mechanic reports</p>
+  </div>
+
+  <!-- Report Type Navigation -->
+  <div class="report-tabs">
+    <button 
+      class="tab-button" 
+      [class.active]="currentReportType === 'customers'"
+      (click)="showReport('customers')">
+      <i class="fas fa-users"></i>
+      Customers Report
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="currentReportType === 'mechanics'"
+      (click)="showReport('mechanics')">
+      <i class="fas fa-wrench"></i>
+      Mechanics Report
+    </button>
+  </div>
+
+  <!-- Customers Report Section -->
+  <div class="report-section" *ngIf="currentReportType === 'customers'">
+    <div class="report-controls">
+      <div class="search-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search customers..." 
+            [(ngModel)]="customerSearch"
+            (input)="filterCustomers()">
+        </div>
+        
+        <div class="filter-group">
+          <select [(ngModel)]="customerStatusFilter" (change)="filterCustomers()">
+            <option value="all">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          
+          <select [(ngModel)]="customerVisitsFilter" (change)="filterCustomers()">
+            <option value="all">All Visits</option>
+            <option value="1-3">1-3 Visits</option>
+            <option value="4-6">4-6 Visits</option>
+            <option value="7+">7+ Visits</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="export-btn" (click)="exportToExcel()">
+          <i class="fas fa-file-excel"></i>
+          Export to Excel
+        </button>
+        <button class="print-btn" (click)="printReport()">
+          <i class="fas fa-print"></i>
+          Print Report
+        </button>
+      </div>
+    </div>
+
+    <div class="report-summary">
+      <div class="summary-card">
+        <h3>Total Customers</h3>
+        <p class="count">{{ getCustomersCount() }}</p>
+      </div>
+      <div class="summary-card">
+        <h3>Active Customers</h3>
+        <p class="count">{{ getActiveCustomersCount() }}</p>
+      </div>
+      <div class="summary-card">
+        <h3>Inactive Customers</h3>
+        <p class="count">{{ getInactiveCustomersCount() }}</p>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Vehicle</th>
+            <th>Last Service</th>
+            <th>Total Visits</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of filteredCustomers">
+            <td>{{ customer.id }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.phone }}</td>
+            <td>{{ customer.vehicle }}</td>
+            <td>{{ customer.lastService }}</td>
+            <td>{{ customer.totalVisits }}</td>
+            <td>
+              <span class="status-badge" [class.active]="customer.status === 'Active'" [class.inactive]="customer.status === 'Inactive'">
+                {{ customer.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mechanics Report Section -->
+  <div class="report-section" *ngIf="currentReportType === 'mechanics'">
+    <div class="report-controls">
+      <div class="search-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search mechanics..." 
+            [(ngModel)]="mechanicSearch"
+            (input)="filterMechanics()">
+        </div>
+        
+        <div class="filter-group">
+          <select [(ngModel)]="mechanicStatusFilter" (change)="filterMechanics()">
+            <option value="all">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          
+          <select [(ngModel)]="mechanicSpecializationFilter" (change)="filterMechanics()">
+            <option value="all">All Specializations</option>
+            <option value="Engine">Engine</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Transmission">Transmission</option>
+            <option value="Brakes">Brakes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="export-btn" (click)="exportToExcel()">
+          <i class="fas fa-file-excel"></i>
+          Export to Excel
+        </button>
+        <button class="print-btn" (click)="printReport()">
+          <i class="fas fa-print"></i>
+          Print Report
+        </button>
+      </div>
+    </div>
+
+    <div class="report-summary">
+      <div class="summary-card">
+        <h3>Total Mechanics</h3>
+        <p class="count">{{ getMechanicsCount() }}</p>
+      </div>
+      <div class="summary-card">
+        <h3>Active Mechanics</h3>
+        <p class="count">{{ getActiveMechanicsCount() }}</p>
+      </div>
+      <div class="summary-card">
+        <h3>Inactive Mechanics</h3>
+        <p class="count">{{ getInactiveMechanicsCount() }}</p>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Mechanic ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Specialization</th>
+            <th>Total Jobs</th>
+            <th>Rating</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mechanic of filteredMechanics">
+            <td>{{ mechanic.id }}</td>
+            <td>{{ mechanic.name }}</td>
+            <td>{{ mechanic.email }}</td>
+            <td>{{ mechanic.phone }}</td>
+            <td>{{ mechanic.specialization }}</td>
+            <td>{{ mechanic.totalJobs }}</td>
+            <td>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                {{ mechanic.rating }}
+              </div>
+            </td>
+            <td>
+              <span class="status-badge" [class.active]="mechanic.status === 'Active'" [class.inactive]="mechanic.status === 'Inactive'">
+                {{ mechanic.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- No Data Message -->
+  <div class="no-data" *ngIf="(currentReportType === 'customers' && filteredCustomers.length === 0) || (currentReportType === 'mechanics' && filteredMechanics.length === 0)">
+    <i class="fas fa-folder-open"></i>
+    <h3>No Data Found</h3>
+    <p>No {{ currentReportType }} match your current filters.</p>
+  </div>
+
+</div>

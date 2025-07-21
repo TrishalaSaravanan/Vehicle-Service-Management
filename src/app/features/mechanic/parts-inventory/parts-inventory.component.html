@@ -1,0 +1,467 @@
+<!-- Parts Inventory Content -->
+<div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm p-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-800">Parts Inventory</h1>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="text-gray-600 hover:text-darkblue-600 relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">2</span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <button 
+                        (click)="navigateToProfile()" 
+                        class="flex items-center space-x-2"
+                    >
+                        <div class="w-8 h-8 rounded-full bg-darkblue-600 flex items-center justify-center text-white">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="hidden md:inline">{{ mechanicName }}</span>
+                        <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Inventory Management Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 md:mb-0">Parts Inventory</h2>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <div class="relative flex-grow">
+                        <input 
+                            type="text" 
+                            [(ngModel)]="searchTerm"
+                            (input)="onSearchChange()"
+                            placeholder="Search parts..." 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-darkblue-500"
+                        >
+                        <div class="absolute left-3 top-2.5 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    <button 
+                        (click)="showAddModal()"
+                        class="bg-darkblue-600 hover:bg-darkblue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition whitespace-nowrap"
+                    >
+                        <i class="fas fa-plus mr-1"></i> Add Part
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700">Category:</label>
+                    <select 
+                        [(ngModel)]="categoryFilter"
+                        (change)="onCategoryChange()"
+                        class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-darkblue-500"
+                    >
+                        <option value="all">All Categories</option>
+                        <option value="Engine">Engine</option>
+                        <option value="Brakes">Brakes</option>
+                        <option value="Suspension">Suspension</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Filters">Filters</option>
+                        <option value="Fluids">Fluids</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700">Status:</label>
+                    <select 
+                        [(ngModel)]="statusFilter"
+                        (change)="onStatusChange()"
+                        class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-darkblue-500"
+                    >
+                        <option value="all">All Status</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700">Sort By:</label>
+                    <select 
+                        [(ngModel)]="sortFilter"
+                        class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-darkblue-500"
+                    >
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="stock-high">Stock (High-Low)</option>
+                        <option value="stock-low">Stock (Low-High)</option>
+                        <option value="price-high">Price (High-Low)</option>
+                        <option value="price-low">Price (Low-High)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Parts Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part Number</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (₹)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr *ngFor="let part of paginatedParts" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
+                                        <i [class]="getPartIcon(part.category)" [ngClass]="getPartIconColor(part.category)"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ part.name }}</div>
+                                        <div class="text-sm text-gray-500">{{ part.compatibility }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ part.number }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ part.category }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ part.stock }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹{{ part.price.toFixed(2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getStatusClass(part.status)">
+                                    {{ part.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button 
+                                    (click)="showEditModal(part)"
+                                    class="text-darkblue-600 hover:text-darkblue-900 mr-3"
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    (click)="deletePart(part.id)"
+                                    class="text-red-600 hover:text-red-900"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-between items-center mt-6">
+                <div class="text-sm text-gray-600">
+                    Showing <span class="font-medium">{{ getStartIndex() }}</span> to <span class="font-medium">{{ getEndIndex() }}</span> of <span class="font-medium">{{ filteredParts.length }}</span> parts
+                </div>
+                <div class="flex space-x-1">
+                    <button 
+                        (click)="previousPage()"
+                        [disabled]="currentPage === 1"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm disabled:opacity-50"
+                    >
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button 
+                        *ngFor="let page of getPageNumbers()"
+                        (click)="goToPage(page)"
+                        [class]="page === currentPage ? 'bg-darkblue-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                        class="px-3 py-1 rounded-md text-sm"
+                    >
+                        {{ page }}
+                    </button>
+                    <button 
+                        (click)="nextPage()"
+                        [disabled]="currentPage === getTotalPages()"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-md text-sm disabled:opacity-50"
+                    >
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Part Modal -->
+<div 
+    *ngIf="showAddPartModal" 
+    class="popup-overlay"
+    (click)="hideAddModal()"
+>
+    <div class="popup-content-large" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Add New Part</h3>
+            <button (click)="hideAddModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form 
+            #addPartForm="ngForm"
+            (ngSubmit)="addPart({
+                name: addPartForm.value.name,
+                number: addPartForm.value.number,
+                category: addPartForm.value.category,
+                compatibility: addPartForm.value.compatibility,
+                stock: addPartForm.value.stock,
+                minStock: addPartForm.value.minStock,
+                price: addPartForm.value.price,
+                description: addPartForm.value.description
+            })"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part Name*</label>
+                    <input 
+                        type="text" 
+                        name="name"
+                        ngModel
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                        placeholder="e.g., Synthetic Oil 5W-30"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part Number*</label>
+                    <input 
+                        type="text" 
+                        name="number"
+                        ngModel
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                        placeholder="e.g., OIL-5W30-SYN"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category*</label>
+                    <select 
+                        name="category"
+                        ngModel
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                        <option value="">Select Category</option>
+                        <option value="Engine">Engine</option>
+                        <option value="Brakes">Brakes</option>
+                        <option value="Suspension">Suspension</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Filters">Filters</option>
+                        <option value="Fluids">Fluids</option>
+                        <option value="Exterior">Exterior</option>
+                        <option value="Interior">Interior</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle Compatibility</label>
+                    <input 
+                        type="text" 
+                        name="compatibility"
+                        ngModel
+                        class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                        placeholder="e.g., Toyota Camry 2015-2020"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Stock*</label>
+                    <input 
+                        type="number" 
+                        name="stock"
+                        ngModel="0"
+                        min="0"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Stock Level</label>
+                    <input 
+                        type="number" 
+                        name="minStock"
+                        ngModel="5"
+                        min="0"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹)*</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-500">₹</span>
+                        <input 
+                            type="number" 
+                            name="price"
+                            ngModel
+                            step="0.01"
+                            required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 pl-8" 
+                            placeholder="0.00"
+                        >
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea 
+                        name="description"
+                        ngModel
+                        class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                        rows="3" 
+                        placeholder="Additional details about the part"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button 
+                    type="button" 
+                    (click)="hideAddModal()"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="submit"
+                    [disabled]="!addPartForm.valid"
+                    class="bg-darkblue-600 hover:bg-darkblue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition disabled:opacity-50"
+                >
+                    Add Part
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Part Modal -->
+<div 
+    *ngIf="showEditPartModal && selectedPart" 
+    class="popup-overlay"
+    (click)="hideEditModal()"
+>
+    <div class="popup-content-large" (click)="$event.stopPropagation()">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Edit Part</h3>
+            <button (click)="hideEditModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form 
+            #editPartForm="ngForm"
+            (ngSubmit)="updatePart(selectedPart!)"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part Name*</label>
+                    <input 
+                        type="text" 
+                        [(ngModel)]="selectedPart.name"
+                        name="name"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part Number*</label>
+                    <input 
+                        type="text" 
+                        [(ngModel)]="selectedPart.number"
+                        name="number"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category*</label>
+                    <select 
+                        [(ngModel)]="selectedPart.category"
+                        name="category"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                        <option value="Engine">Engine</option>
+                        <option value="Brakes">Brakes</option>
+                        <option value="Suspension">Suspension</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Filters">Filters</option>
+                        <option value="Fluids">Fluids</option>
+                        <option value="Exterior">Exterior</option>
+                        <option value="Interior">Interior</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle Compatibility</label>
+                    <input 
+                        type="text" 
+                        [(ngModel)]="selectedPart.compatibility"
+                        name="compatibility"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Stock*</label>
+                    <input 
+                        type="number" 
+                        [(ngModel)]="selectedPart.stock"
+                        name="stock"
+                        min="0"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Stock Level</label>
+                    <input 
+                        type="number" 
+                        [(ngModel)]="selectedPart.minStock"
+                        name="minStock"
+                        min="0"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹)*</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-500">₹</span>
+                        <input 
+                            type="number" 
+                            [(ngModel)]="selectedPart.price"
+                            name="price"
+                            step="0.01"
+                            required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 pl-8"
+                        >
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea 
+                        [(ngModel)]="selectedPart.description"
+                        name="description"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2" 
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button 
+                    type="button" 
+                    (click)="hideEditModal()"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="submit"
+                    [disabled]="!editPartForm.valid"
+                    class="bg-darkblue-600 hover:bg-darkblue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition disabled:opacity-50"
+                >
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

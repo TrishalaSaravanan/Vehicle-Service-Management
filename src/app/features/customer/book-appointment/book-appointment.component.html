@@ -1,0 +1,231 @@
+<div class="bg-gray-50 min-h-screen font-sans">
+  <!-- Back Button -->
+  <div class="flex items-center pt-6 pl-6">
+    <button (click)="goToDashboard()" class="text-[#1B4B88] hover:text-blue-900 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      <span class="font-medium">Back</span>
+    </button>
+  </div>
+  
+  <!-- Progress Steps -->
+  <div class="flex justify-center mb-8 pt-8">
+    <div class="flex items-center">
+      <div class="flex flex-col items-center mr-4 sm:mr-8">
+        <div [ngClass]="{'step-indicator active': step === 1, 'step-indicator': step !== 1}"
+             class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-1 cursor-pointer"
+             (click)="goToStep(1)">1</div>
+        <span class="text-xs sm:text-sm font-medium" [ngClass]="{'text-[#1B4B88]': step === 1, 'text-gray-500': step !== 1}">Vehicle</span>
+      </div>
+      <div class="h-1 w-8 sm:w-16 bg-gray-300 mx-2"></div>
+      <div class="flex flex-col items-center mr-4 sm:mr-8">
+        <div [ngClass]="{'step-indicator active': step === 2, 'step-indicator': step !== 2}"
+             class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-1 cursor-pointer"
+             (click)="goToStep(2)">2</div>
+        <span class="text-xs sm:text-sm font-medium" [ngClass]="{'text-[#1B4B88]': step === 2, 'text-gray-500': step !== 2}">Service</span>
+      </div>
+      <div class="h-1 w-8 sm:w-16 bg-gray-300 mx-2"></div>
+      <div class="flex flex-col items-center">
+        <div [ngClass]="{'step-indicator active': step === 3, 'step-indicator': step !== 3}"
+             class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-1 cursor-pointer"
+             (click)="goToStep(3)">3</div>
+        <span class="text-xs sm:text-sm font-medium" [ngClass]="{'text-[#1B4B88]': step === 3, 'text-gray-500': step !== 3}">Schedule</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Vehicle Selection -->
+  <div *ngIf="step === 1" class="step active max-w-4xl mx-auto">
+    <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300 text-center font-medium">
+      {{ errorMessage }}
+    </div>
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+      <div class="p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Select Your Vehicle</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div *ngFor="let v of vehicles" (click)="selectVehicle(v)" [ngClass]="{'vehicle-card selected': selectedVehicle?.id === v.id, 'vehicle-card': selectedVehicle?.id !== v.id}" class="vehicle-card border-2 border-gray-200 rounded-xl p-4 flex items-center cursor-pointer transition">
+            <div class="mr-4 text-3xl text-gray-400">
+              <i class="fas fa-car"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold">{{v.brand}} {{v.model}}</h3>
+              <p class="text-sm text-gray-600">{{v.year}} • {{v.licensePlate}}</p>
+              <p class="text-xs text-gray-500">{{v.mileage}} km</p>
+            </div>
+            <div class="ml-auto text-[#1B4B88]">
+              <i class="fas fa-check-circle" *ngIf="selectedVehicle?.id === v.id"></i>
+            </div>
+          </div>
+        </div>
+        <button class="text-[#1B4B88] font-medium text-sm flex items-center mb-4" (click)="showAddVehicle = true">
+          <i class="fas fa-plus-circle mr-2"></i> Add New Vehicle
+        </button>
+        <div *ngIf="showAddVehicle" class="border-t pt-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-gray-700 mb-1">Brand</label>
+              <input type="text" [(ngModel)]="newVehicle.brand" class="w-full p-2 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-1">Model</label>
+              <input type="text" [(ngModel)]="newVehicle.model" class="w-full p-2 border border-gray-300 rounded-lg">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <label class="block text-gray-700 mb-1">Year</label>
+              <input type="number" [(ngModel)]="newVehicle.year" class="w-full p-2 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-1">License Plate</label>
+              <input type="text" [(ngModel)]="newVehicle.licensePlate" class="w-full p-2 border border-gray-300 rounded-lg">
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-1">Current Mileage (km)</label>
+            <input type="number" [(ngModel)]="newVehicle.mileage" class="w-full p-2 border border-gray-300 rounded-lg">
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button class="px-4 py-2 border border-gray-300 rounded-lg" (click)="showAddVehicle = false">Cancel</button>
+            <button class="px-4 py-2 bg-[#1B4B88] text-white rounded-lg" (click)="addNewVehicle()">Save Vehicle</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6 flex justify-end">
+      <button class="bg-[#1B4B88] text-white py-2 px-6 rounded-lg hover:bg-blue-900 transition font-medium" (click)="goToStep(2)">
+        Next <i class="fas fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Service Selection -->
+  <div *ngIf="step === 2" class="step max-w-4xl mx-auto">
+    <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300 text-center font-medium">
+      {{ errorMessage }}
+    </div>
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+      <div class="p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Choose Services</h2>
+        <div class="space-y-3">
+          <div *ngFor="let s of services" (click)="toggleService(s)" [ngClass]="{'service-card selected': s.selected, 'service-card': !s.selected}" class="service-card border rounded-lg p-4 cursor-pointer transition fade-in">
+            <div class="flex items-start">
+              <input type="checkbox" class="mt-1 mr-3 h-5 w-5 text-[#1B4B88] rounded border-gray-300" [(ngModel)]="s.selected" (click)="$event.stopPropagation()">
+              <div class="flex-1">
+                <div class="flex justify-between items-start">
+                  <span class="font-semibold">{{s.name}}</span>
+                  <span class="font-bold text-[#1B4B88]">₹{{s.price | number}}</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">{{s.description}}</p>
+                <div class="flex items-center text-xs text-gray-500 mt-2">
+                  <i class="far fa-clock mr-1"></i>
+                  <span>{{s.duration}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Schedule Selection (Restored to original single-column design) -->
+  <div *ngIf="step === 3" class="step max-w-4xl mx-auto">
+    <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300 text-center font-medium">
+      {{ errorMessage }}
+    </div>
+    <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+      <div class="p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Select Date & Time</h2>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Date</label>
+          <div class="relative">
+            <input type="date" [(ngModel)]="appointmentDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1B4B88] focus:border-[#1B4B88]" [min]="minDate">
+            <i class="fas fa-calendar-alt absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Available Time Slots</label>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <button *ngFor="let t of timeSlots" class="time-slot py-2 px-3 border border-gray-200 rounded-lg text-sm font-medium hover:bg-[#1B4B88] hover:text-white transition" [ngClass]="{'selected': appointmentTime === t}" (click)="selectTimeSlot(t)">{{t}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Floating Bar with Navigation -->
+  <div *ngIf="step >= 2" class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t p-4 z-10">
+    <div class="container mx-auto max-w-4xl flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        <p class="text-sm text-gray-600">Total Estimate</p>
+        <p class="text-xl font-bold text-[#1B4B88]">₹{{ getTotalPrice() | number }}</p>
+      </div>
+      <div class="flex gap-2">
+        <button *ngIf="step === 2" class="px-4 py-2 border border-gray-300 rounded-lg" (click)="goToStep(1)">
+          <i class="fas fa-arrow-left mr-2"></i> Back
+        </button>
+        <button *ngIf="step === 2" class="bg-[#1B4B88] text-white py-2 px-6 rounded-lg hover:bg-blue-900 transition font-medium" (click)="goToStep(3)">
+          Next <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+        <button *ngIf="step === 3" class="px-4 py-2 border border-gray-300 rounded-lg" (click)="goToStep(2)">
+          <i class="fas fa-arrow-left mr-2"></i> Back
+        </button>
+        <button *ngIf="step === 3" class="bg-[#1B4B88] text-white py-2 px-6 rounded-lg hover:bg-blue-900 transition font-medium" (click)="confirmBooking()">
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Processing Modal -->
+  <div *ngIf="showProcessing" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
+    <div class="bg-white rounded-2xl w-full max-w-md mx-4 p-6 text-center">
+      <div class="loading-spinner mx-auto mb-4"></div>
+      <h3 class="text-xl font-bold text-gray-800 mb-2">Processing Your Booking</h3>
+      <p class="text-gray-600">Your appointment request is being processed. You'll receive a confirmation once approved by the admin.</p>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div *ngIf="showSuccess" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
+    <div class="bg-white rounded-2xl w-full max-w-md mx-4 slide-in">
+      <div class="p-6 text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-check text-green-500 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Booking Request Submitted!</h3>
+        <p class="text-gray-600 mb-6">Your service appointment request has been submitted for admin approval. You'll receive a confirmation soon.</p>
+        <div class="bg-blue-50 p-4 rounded-lg mb-6 text-left space-y-3">
+          <div class="flex items-start">
+            <i class="fas fa-car text-gray-500 mt-1 mr-3"></i>
+            <div>
+              <p class="font-medium">{{selectedVehicle?.brand}} {{selectedVehicle?.model}}</p>
+              <p class="text-sm text-gray-600">{{selectedVehicle?.year}} • {{selectedVehicle?.licensePlate}} • {{selectedVehicle?.mileage}} km</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <i class="fas fa-tools text-gray-500 mt-1 mr-3"></i>
+            <div>
+              <ng-container *ngFor="let s of services"><ng-container *ngIf="s.selected">
+                <p class="font-medium">{{s.name}}</p>
+                <p class="text-sm text-gray-600">₹{{s.price | number}} • {{s.duration}}</p>
+              </ng-container></ng-container>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <i class="far fa-calendar-alt text-gray-500 mt-1 mr-3"></i>
+            <div>
+              <p class="font-medium">{{ appointmentDate | date: 'fullDate' }}</p>
+              <p class="text-sm text-gray-600">{{ appointmentTime }}</p>
+            </div>
+          </div>
+        </div>
+        <button (click)="redirectToAppointments()" class="w-full bg-[#1B4B88] text-white py-3 px-4 rounded-lg hover:bg-blue-900 transition font-medium">
+          View My Appointments
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

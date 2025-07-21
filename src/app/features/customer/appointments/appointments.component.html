@@ -1,0 +1,51 @@
+<div class="container mx-auto px-4 py-16 max-w-4xl">
+  <!-- Header with Back Button -->
+  <div class="flex items-center mb-8">
+    <button (click)="navigateHome()" class="mr-4 text-[#1B4B88] hover:text-blue-900">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+    </button>
+    <h1 class="text-3xl font-bold text-[#1B4B88]">My Appointments</h1>
+  </div>
+  <div class="bg-white rounded-lg shadow-md p-8">
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-[#1B4B88] mb-4">Upcoming Appointments</h2>
+      <div class="space-y-4">
+        <div *ngFor="let a of appointments" class="border-l-4 pl-4 py-3 rounded-r"
+          [ngClass]="{
+            'border-green-500 bg-green-50': a.status === 'Confirmed',
+            'border-yellow-500 bg-yellow-50': a.status === 'Pending',
+            'border-gray-400 bg-gray-50': a.status === 'Completed' || a.status === 'Cancelled'
+          }">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="font-medium">{{ a.date }} • {{ a.time }}</p>
+              <p class="text-gray-600">
+                <span *ngIf="a.vehicle">{{ a.vehicle.brand }} {{ a.vehicle.model }} ({{ a.vehicle.licensePlate }})</span>
+                <span *ngIf="!a.vehicle">Vehicle ID: {{ a.vehicleId }}</span>
+                <br>
+                <ng-container *ngIf="a.services && a.services.length > 0">
+                  <ng-container *ngFor="let s of a.services; let last = last">
+                    {{ s.name || s }}<span *ngIf="!last">, </span>
+                  </ng-container>
+                </ng-container>
+              </p>
+            </div>
+            <span class="text-xs px-2 py-1 rounded"
+              [ngClass]="{
+                'bg-green-100 text-green-800': a.status === 'Confirmed',
+                'bg-yellow-100 text-yellow-800': a.status === 'Pending',
+                'bg-gray-200 text-gray-800': a.status === 'Completed' || a.status === 'Cancelled'
+              }">{{ a.status }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center">
+      <button (click)="navigateToBookAppointment()" class="inline-block bg-[#1B4B88] text-white py-2 px-6 rounded-lg font-medium hover:bg-blue-900 transition">
+        Book New Appointment
+      </button>
+    </div>
+  </div>
+</div>
